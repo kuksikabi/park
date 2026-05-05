@@ -29,9 +29,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="config.py" />
-    <Compile Include="extensions.py" />
-    <Compile Include="models.py" />
     <Compile Include="park\common\interfaces.py">
       <SubType>Code</SubType>
     </Compile>
@@ -57,9 +54,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="park\views.py" />
-    <Compile Include="__init__.py" />
+    <Compile Include="park\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="instance\" />
     <Folder Include="park\" />
     <Folder Include="park\common\" />
     <Folder Include="park\common\services\" />

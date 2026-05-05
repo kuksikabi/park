@@ -1,7 +1,7 @@
 ﻿# park/views.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
-from extensions import db
+from park.extensions import db  # <-- Добавь "park."
 from park.common.models import Visitor, Attraction, Purchase, Payment, Ticket, VisitRecord, AuditLog
 from park.common.services.ticket_service import TicketService
 from park.common.services.access_control_service import AccessControlService

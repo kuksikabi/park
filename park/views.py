@@ -1,5 +1,5 @@
+
 from flask import Blueprint, render_template
-from park.extensions import db
 
 main_bp = Blueprint('main', __name__)
 

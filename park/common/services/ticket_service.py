@@ -1,11 +1,10 @@
-﻿
-from typing import Dict, List, Optional
+﻿from typing import Dict, List, Optional
 from common.interfaces import ITicketService
 
 class TicketService(ITicketService):
     """
     Сервис управления билетами
-    TODO: Реализовать бизнес-логику
+    Бизнес-логика для создания, активации и управления билетами
     """
     
     def __init__(self, db_session):
@@ -25,82 +24,43 @@ class TicketService(ITicketService):
         age_category: str,
         duration_minutes: Optional[int] = None
     ) -> Dict:
-        """
-        Создать новый билет
-        
-        Args:
-            visitor_id: ID посетителя
-            purchase_id: ID покупки
-            ticket_status: Тип билета (standard/vip/platinum)
-            age_category: Возрастная категория (adult/child)
-            duration_minutes: Длительность в минутах (опционально)
-        
-        Returns:
-            Dict с данными созданного билета
-        
-        Raises:
-            ValueError: При некорректных данных
-        """
+        """Создать новый билет"""
         # TODO: Реализовать
-        # 1. Проверить валидность visitor_id и purchase_id
-        # 2. Получить цену из price_list
-        # 3. Рассчитать valid_until
-        # 4. Создать запись в таблице tickets
-        # 5. Вернуть созданный билет
         pass
     
     def calculate_price(self, ticket_type: str, age_category: str) -> float:
-        """
-        Рассчитать стоимость билета
-        
-        Args:
-            ticket_type: Тип билета
-            age_category: Возрастная категория
-        
-        Returns:
-            Стоимость в рублях
-        
-        Raises:
-            ValueError: Если цена не найдена
-        """
+        """Рассчитать стоимость билета"""
         # TODO: Реализовать
-        # 1. Запрос к таблице price_list
-        # 2. Фильтрация по ticket_status и age_category
-        # 3. Возврат актуальной цены
         pass
     
     def validate_ticket(self, ticket_id: int) -> Dict:
-        """
-        Проверить статус и валидность билета
-        
-        Args:
-            ticket_id: ID билета
-        
-        Returns:
-            Dict с информацией о билете
-        
-        Raises:
-            ValueError: Если билет не найден
-        """
+        """Проверить статус и валидность билета"""
         # TODO: Реализовать
-        # 1. Получить билет из БД
-        # 2. Проверить is_activated
-        # 3. Проверить valid_until
-        # 4. Проверить remaining_time
         pass
     
     def activate_ticket(self, ticket_id: int) -> bool:
+        """Активировать билет"""
+        # TODO: Реализовать
+        pass
+    
+    def extend_ticket_time(self, ticket_id: int, additional_minutes: int) -> bool:
         """
-        Активировать билет
+        Продлить время действия билета
         
         Args:
             ticket_id: ID билета
+            additional_minutes: Дополнительное количество минут
         
         Returns:
-            True если активация успешна
+            True если продление успешно
         
         Raises:
-            ValueError: Если билет уже активирован или просрочен
+            ValueError: Если билет не имеет ограничения по времени или истёк
         """
         # TODO: Реализовать
+        # 1. Получить билет из БД
+        # 2. Проверить duration_minutes is not None
+        # 3. Проверить valid_until > now
+        # 4. Обновить remaining_time и valid_until
+        # 5. Сохранить + записать в audit_log
         pass

@@ -78,6 +78,31 @@ class TestTicketService:
         """
         # TODO: После реализации
         pass
+    
+    def test_extend_ticket_time_success(self):
+        """
+        Тест: Успешное продление времени билета
+        
+        Ожидаемый результат: 
+        - Возврат True
+        - remaining_time увеличен на additional_minutes
+        """
+        # TODO: После реализации
+        # result = self.service.extend_ticket_time(ticket_id=1, additional_minutes=60)
+        # assert result is True
+        # assert ticket.remaining_time == original_time + 60
+        pass
+    
+    def test_extend_ticket_time_unlimited_raises_error(self):
+        """
+        Тест: Ошибка при продлении билета без ограничения по времени
+        
+        Ожидаемый результат: ValueError
+        """
+        # TODO: После реализации
+        # with pytest.raises(ValueError):
+        #     self.service.extend_ticket_time(ticket_id=2, additional_minutes=30)
+        pass
 
 
 class TestAccessControlService:

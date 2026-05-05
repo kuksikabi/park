@@ -12,7 +12,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     
     # Связи
-    visitor = db.relationship('Visitor', backref='user_account', uselist=False)
+    visitor = db.relationship('Visitor', backref='user', uselist=False, cascade="all, delete-orphan")
 
 
 # ==================== VISITORS ====================
@@ -20,7 +20,7 @@ class Visitor(db.Model):
     __tablename__ = 'visitors'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=True)  
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(50))
     age_category = db.Column(db.String(20), nullable=False)  # adult/child

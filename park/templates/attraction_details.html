@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ attraction.name }} — Детали{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 pt-16 pb-20">
+    <div class="flex flex-col lg:flex-row gap-16">
+        <!-- Левая колонка: Изображение и описание -->
+        <div class="flex-[1.5]">
+            <a href="/attractions" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-indigo-600 mb-8 transition-colors">
+                <i class="fas fa-chevron-left"></i> Назад к списку
+            </a>
+            <div class="rounded-[3rem] overflow-hidden shadow-2xl mb-12 h-[500px]">
+                <img src="https://images.unsplash.com/photo-1513889959063-e2766996f241?auto=format&fit=crop&q=80&w=1200" class="w-full h-full object-cover" alt="{{ attraction.name }}">
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-6">{{ attraction.name }}</h1>
+            <div class="prose prose-slate max-w-none text-slate-500 leading-relaxed text-lg">
+                {{ attraction.description }}
+            </div>
+        </div>
+        <!-- Правая колонка: Характеристики и доступ -->
+        <div class="flex-1">
+            <div class="sticky top-28 space-y-8">
+                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                    <h3 class="text-xl font-bold mb-8 text-slate-900">Характеристики</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                            <span class="text-slate-400 font-medium">Категория</span>
+                            <span class="font-bold text-indigo-600">{{ attraction.category }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                            <span class="text-slate-400 font-medium">Возраст</span>
+                            <span class="font-bold text-slate-900">{{ attraction.min_age }}+</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                            <span class="text-slate-400 font-medium">Статус</span>
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase">{{ attraction.status }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="bg-indigo-600 p-10 rounded-[2.5rem] text-white shadow-xl shadow-indigo-200">
+                    <h3 class="text-xl font-bold mb-6">Ваш доступ</h3>
+                    {% if tickets %}
+                    <form action="{{ url_for('main.enter_attraction', attraction_id=attraction.id) }}" method="POST">
+                        <p class="text-indigo-100 text-sm mb-6 leading-relaxed text-center">Выберите билет для прохода через турникет</p>
+                        <select name="ticket_id" class="w-full bg-indigo-500 text-white rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-white/50 mb-6 font-bold cursor-pointer">
+                            {% for ticket in tickets %}
+                            <option value="{{ ticket.id }}">Билет #{{ ticket.id }} ({{ ticket.ticket_status }})</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="w-full bg-white text-indigo-600 py-4 rounded-2xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+                            Открыть турникет
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-indigo-100 text-sm mb-8 leading-relaxed">У вас пока нет активных билетов для этого аттракциона.</p>
+                    <a href="/buy_ticket" class="block w-full text-center bg-white text-indigo-600 py-4 rounded-2xl font-bold text-lg hover:shadow-lg transition-all">
+                        Купить билет
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,29 +1,23 @@
 ﻿import os
-from flask import Flask
-from park.extensions import db  # ← Правильный импорт из подпакета
+from park import create_app  # ИСПРАВЛЕНО: импортируем из park, а не park.app
+from park.extensions import db
 
-def create_app():
-    base_dir = os.path.abspath(os.path.dirname(__file__))
-    
-    app = Flask(
-        __name__,
-        template_folder=os.path.join(base_dir, 'templates'),
-        static_folder=os.path.join(base_dir, 'static')
-    )
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/park.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'dev-key'
-    
-    db.init_app(app)
-    
-    from park.views import main_bp  
-    app.register_blueprint(main_bp)
-    
-    return app
+app = create_app()
 
-if __name__ == '__main__':
-    app = create_app()
+if __name__ == "__main__":
+    # Гарантируем наличие папки instance перед запуском
+    instance_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance')
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path)
+        print(f"✅ Создана папка: {instance_path}")
+
     with app.app_context():
-        db.create_all()
+        try:
+            # Если seed_data.py уже сработал, эта строка просто проверит связь
+            db.create_all()
+            print("✅ Подключение к базе данных успешно")
+        except Exception as e:
+            print(f"❌ Ошибка базы данных: {e}")
+            print("Совет: Попробуйте закрыть все программы, которые могут использовать park.db")
+
     app.run(debug=True)

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Парк Развлечений{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -4px;
+                left: 0;
+                background: #6366f1;
+                transition: width 0.3s;
+            }
+
+            .nav-link:hover::after {
+                width: 100%;
+            }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-900 antialiased">
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-ferris-wheel text-xl"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight text-slate-800">Парк развлечений</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-10">
+                <a href="/attractions" class="nav-link text-sm font-semibold text-slate-600 hover:text-indigo-600">Аттракционы</a>
+                <a href="/buy_ticket" class="nav-link text-sm font-semibold text-slate-600 hover:text-indigo-600">Купить билет</a>
+                {% if current_user.is_authenticated %}
+                <a href="/dashboard" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-indigo-600 transition-all shadow-md">Личный кабинет</a>
+                {% else %}
+                <a href="/login" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main class="pt-20">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-6 mt-6">
+            {% for category, message in messages %}
+            <div class="p-4 rounded-2xl flex items-center gap-3 {% if category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-100{% else %}bg-rose-50 text-rose-700 border border-rose-100{% endif %}">
+                <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                <span class="font-medium text-sm">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="bg-white border-t border-slate-100 py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-ferris-wheel text-slate-500 text-xs"></i>
+                </div>
+                <span class="font-bold text-slate-400">© 2026 FunPark Inc.</span>
+            </div>
+            <div class="flex gap-6 text-slate-400 text-sm">
+                <a href="#" class="hover:text-indigo-600">Правила парка</a>
+                <a href="#" class="hover:text-indigo-600">Контакты</a>
+                <a href="#" class="hover:text-indigo-600">Помощь</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

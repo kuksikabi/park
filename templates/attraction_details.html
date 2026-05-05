@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ attraction.name }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Категория:</strong> {{ attraction.category }}</p>
+            <p><strong>Мин. возраст:</strong> {{ attraction.min_age }}+</p>
+            <p><strong>Описание:</strong> {{ attraction.description }}</p>
+            <p>
+                <strong>Статус:</strong>
+                <span class="badge bg-{{ 'success' if attraction.status == 'available' else 'danger' }}">
+                    {{ attraction.status }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    {% if tickets %}
+    <h3>🎟 Пройти на аттракцион</h3>
+    <form method="POST" action="{{ url_for('main.enter_attraction', attraction_id=attraction.id) }}">
+        <div class="mb-3">
+            <label class="form-label">Выберите билет:</label>
+            <select name="ticket_id" class="form-select" required>
+                <option value="">-- Выберите --</option>
+                {% for ticket in tickets %}
+                <option value="{{ ticket.id }}"
+                        {% if not ticket.is_activated or (ticket.remaining_time is not none and ticket.remaining_time <= 0) %}disabled{% endif %}>
+                    #{{ ticket.id }} | {{ ticket.status|upper }}
+                    {% if ticket.remaining_time %}
+                        | ⏱ {{ ticket.remaining_time }} мин.
+                    {% else %}
+                        | ∞ безлимит
+                    {% endif %}
+                    {% if not ticket.is_activated %}(не активирован){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">🚪 Пройти турникет</button>
+    </form>
+    {% else %}
+    <div class="alert alert-info">
+        У вас нет активных билетов.
+        <a href="{{ url_for('main.buy_ticket') }}">Купить билет</a>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('main.attractions') }}" class="btn btn-secondary mt-3">← Все аттракционы</a>
+</div>
+{% endblock %}

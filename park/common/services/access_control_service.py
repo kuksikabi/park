@@ -1,27 +1,97 @@
 ﻿
-from typing import Dict, Tuple
-from common.interfaces import IAccessStrategy
+from typing import Dict, Tuple, Optional
+from ..interfaces import IAccessStrategy
+from ..models import AccessRule, Attraction, Ticket, Visitor, VisitRecord, AuditLog, db
+from datetime import datetime
+
+class StandardAccessStrategy(IAccessStrategy):
+    """Стратегия для билетов Standard"""
+    
+    def check_access(
+        self,
+        ticket_status: str,
+        attraction_category: str,
+        visitor_age: int,
+        attraction_min_age: int
+    ) -> Tuple[bool, str]:
+        # Проверка по матрице доступа
+        rule = AccessRule.query.filter_by(
+            ticket_status='standard',
+            attraction_category=attraction_category.lower()
+        ).first()
+        
+        if not rule or not rule.is_allowed:
+            return False, "Ваш билет не даёт доступа к этой категории аттракционов"
+        
+        # Проверка возраста
+        if visitor_age < attraction_min_age:
+            return False, f"Недостаточный возраст. Минимум: {attraction_min_age} лет"
+        
+        return True, "Доступ разрешён"
+    
+    def has_priority_access(self, ticket_status: str) -> bool:
+        return False
+
+
+class VIPAccessStrategy(IAccessStrategy):
+    """Стратегия для билетов VIP"""
+    
+    def check_access(
+        self,
+        ticket_status: str,
+        attraction_category: str,
+        visitor_age: int,
+        attraction_min_age: int
+    ) -> Tuple[bool, str]:
+        # VIP имеет доступ ко всем категориям
+        rule = AccessRule.query.filter_by(
+            ticket_status='vip',
+            attraction_category=attraction_category.lower()
+        ).first()
+        
+        if rule and not rule.is_allowed:
+            return False, "Аттракцион временно недоступен"
+        
+        # Проверка возраста (строже)
+        if visitor_age < attraction_min_age:
+            return False, f"Недостаточный возраст. Минимум: {attraction_min_age} лет"
+        
+        return True, "Доступ разрешён (VIP)"
+    
+    def has_priority_access(self, ticket_status: str) -> bool:
+        return True
+
+
+class PlatinumAccessStrategy(IAccessStrategy):
+    """Стратегия для билетов Platinum"""
+    
+    def check_access(
+        self,
+        ticket_status: str,
+        attraction_category: str,
+        visitor_age: int,
+        attraction_min_age: int
+    ) -> Tuple[bool, str]:
+        # Platinum: почти полный доступ
+        # Только абсолютные ограничения по возрасту
+        if visitor_age < attraction_min_age:
+            return False, f"Абсолютное ограничение: минимум {attraction_min_age} лет"
+        
+        return True, "Доступ разрешён (Platinum)"
+    
+    def has_priority_access(self, ticket_status: str) -> bool:
+        return True
+
 
 class AccessControlService:
-    """
-    Сервис контроля доступа
-    Использует паттерн Strategy для проверки прав доступа
-    """
+    """Сервис контроля доступа с паттерном Strategy"""
     
     def __init__(self):
-        """Инициализация сервиса с регистрацией стратегий"""
-        self.strategies: Dict[str, IAccessStrategy] = {}
-        # TODO: Зарегистрировать стратегии для standard, vip, platinum
-    
-    def register_strategy(self, ticket_type: str, strategy: IAccessStrategy):
-        """
-        Зарегистрировать стратегию для типа билета
-        
-        Args:
-            ticket_type: Тип билета (standard/vip/platinum)
-            strategy: Экземпляр стратегии
-        """
-        self.strategies[ticket_type.lower()] = strategy
+        self.strategies = {
+            'standard': StandardAccessStrategy(),
+            'vip': VIPAccessStrategy(),
+            'platinum': PlatinumAccessStrategy()
+        }
     
     def validate_access(
         self,
@@ -29,96 +99,38 @@ class AccessControlService:
         attraction_category: str,
         visitor_age: int,
         attraction_min_age: int,
-        remaining_time: int = None
+        remaining_time: Optional[int] = None
     ) -> Dict:
-        """
-        Проверить доступ посетителя к аттракциону
+        """Проверить доступ посетителя к аттракциону"""
         
-        Args:
-            ticket_status: Тип билета посетителя
-            attraction_category: Категория аттракциона
-            visitor_age: Возраст посетителя
-            attraction_min_age: Минимальный возраст для аттракциона
-            remaining_time: Оставшееся время билета (опционально)
-        
-        Returns:
-            Dict {
-                'allowed': bool,
-                'message': str,
-                'priority': bool
+        # Проверка времени билета
+        if remaining_time is not None and remaining_time <= 0:
+            return {
+                'allowed': False,
+                'message': 'Время действия билета истекло',
+                'priority': False
             }
-        """
-        # TODO: Реализовать
-        # 1. Получить стратегию по ticket_status
-        # 2. Проверить remaining_time (если есть)
-        # 3. Вызвать strategy.check_access()
-        # 4. Вернуть результат
-        pass
-
-
-class StandardAccessStrategy(IAccessStrategy):
-    """Стратегия доступа для билетов Standard"""
-    
-    def check_access(
-        self,
-        ticket_status: str,
-        attraction_category: str,
-        visitor_age: int,
-        attraction_min_age: int
-    ) -> Tuple[bool, str]:
-        """
-        Проверка доступа для Standard
         
-        TODO: Реализовать логику
-        - Проверить access_rules
-        - Проверить возраст
-        """
-        pass
-    
-    def has_priority_access(self, ticket_status: str) -> bool:
-        """Standard не имеет приоритетного доступа"""
-        pass
-
-
-class VIPAccessStrategy(IAccessStrategy):
-    """Стратегия доступа для билетов VIP"""
-    
-    def check_access(
-        self,
-        ticket_status: str,
-        attraction_category: str,
-        visitor_age: int,
-        attraction_min_age: int
-    ) -> Tuple[bool, str]:
-        """
-        Проверка доступа для VIP
+        # Получаем стратегию
+        strategy = self.strategies.get(ticket_status.lower())
+        if not strategy:
+            return {
+                'allowed': False,
+                'message': f'Неизвестный тип билета: {ticket_status}',
+                'priority': False
+            }
         
-        TODO: Реализовать логику
-        """
-        pass
-    
-    def has_priority_access(self, ticket_status: str) -> bool:
-        """VIP имеет приоритетный доступ"""
-        pass
-
-
-class PlatinumAccessStrategy(IAccessStrategy):
-    """Стратегия доступа для билетов Platinum"""
-    
-    def check_access(
-        self,
-        ticket_status: str,
-        attraction_category: str,
-        visitor_age: int,
-        attraction_min_age: int
-    ) -> Tuple[bool, str]:
-        """
-        Проверка доступа для Platinum
+        # Делегируем проверку стратегии
+        allowed, message = strategy.check_access(
+            ticket_status, attraction_category, visitor_age, attraction_min_age
+        )
         
-        TODO: Реализовать логику
-        """
-        pass
+        return {
+            'allowed': allowed,
+            'message': message,
+            'priority': strategy.has_priority_access(ticket_status)
+        }
     
-    def has_priority_access(self, ticket_status: str) -> bool:
-        """Platinum имеет приоритетный доступ"""
-        pass
+    def register_strategy(self, ticket_type: str, strategy: IAccessStrategy):
+        """Зарегистрировать кастомную стратегию"""
+        self.strategies[ticket_type.lower()] = strategy

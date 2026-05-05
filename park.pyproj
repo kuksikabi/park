@@ -53,8 +53,10 @@
     <Compile Include="park\tests\__init__.py" />
     <Compile Include="runserver.py" />
     <Compile Include="park\common\__init__.py" />
+    <Compile Include="seed_data.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="park\views.py" />
-    <Compile Include="views.py" />
     <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +71,7 @@
     <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="templates\attraction_details.html" />
     <Content Include="templates\base.html" />
     <Content Include="requirements.txt" />
     <Content Include="static\content\bootstrap.css" />

@@ -1,57 +1,61 @@
-﻿<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Купить билет - Парк развлечений</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">🎡 Парк развлечений</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="{{ url_for('main.attractions') }}">Аттракционы</a>
-                <a class="nav-link" href="{{ url_for('main.buy_ticket') }}">Купить билет</a>
-            </div>
-        </div>
-    </nav>
+﻿{% extends "base.html" %}
 
-    <div class="container mt-5">
-        <h1>🎫 Купить билет</h1>
-        <div class="row mt-4">
+{% block content %}
+<div class="container mt-5">
+    <h1>🎫 Купить билет</h1>
+
+    <form method="POST" class="mt-4">
+        <div class="row">
+            <!-- Standard -->
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-body text-center">
-                        <h3 class="card-title">Standard</h3>
-                        <p class="card-text">Базовый доступ ко всем аттракционам</p>
+                        <h3>Standard</h3>
+                        <p>Базовый доступ: классика + приключения</p>
                         <h4 class="text-primary">500 ₽</h4>
-                        <button type="button" class="btn btn-primary">Выбрать</button>
+                        <p class="text-muted">⏱ 4 часа</p>
+                        <button type="submit" name="ticket_type" value="standard"
+                                class="btn btn-primary">
+                            Выбрать
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- VIP -->
             <div class="col-md-4">
                 <div class="card mb-4 border-success">
                     <div class="card-body text-center">
-                        <h3 class="card-title">VIP</h3>
-                        <p class="card-text">Приоритетный доступ + экстрим аттракционы</p>
+                        <h3>VIP</h3>
+                        <p>Расширенный доступ + экстрим</p>
                         <h4 class="text-success">1000 ₽</h4>
-                        <button type="button" class="btn btn-success">Выбрать</button>
+                        <p class="text-muted">⏱ Безлимит</p>
+                        <button type="submit" name="ticket_type" value="vip"
+                                class="btn btn-success">
+                            Выбрать
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Platinum -->
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-body text-center">
-                        <h3 class="card-title">Platinum</h3>
-                        <p class="card-text">Полный доступ без ограничений</p>
+                        <h3>Platinum</h3>
+                        <p>Полный доступ без ограничений</p>
                         <h4 class="text-warning">1500 ₽</h4>
-                        <button type="button" class="btn btn-warning">Выбрать</button>
+                        <p class="text-muted">⏱ Безлимит + приоритет</p>
+                        <button type="submit" name="ticket_type" value="platinum"
+                                class="btn btn-warning">
+                            Выбрать
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">← На главную</a>
-    </div>
-</body>
-</html>
+    </form>
+
+    <a href="/" class="btn btn-secondary">← На главную</a>
+</div>
+{% endblock %}
